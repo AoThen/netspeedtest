@@ -1,0 +1,42 @@
+name: Build
+
+on:
+  push:
+
+
+jobs:
+  build:
+    name: Build ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - aarch64_cortex-a53
+          - x86_64
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+
+
+      - name: Building packages
+        uses: sbwml/openwrt-gh-action-sdk@go1.22
+        env:
+          ARCH: ${{ matrix.arch }}-openwrt-22.03
+          FEEDNAME: packages_ci
+          PACKAGES: luci-app-netspeedtest
+          NO_REFRESH_CHECK: true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.arch }}
+          path: bin/packages/${{ matrix.arch }}/packages_ci/*.ipk
+
+      - name: Delete workflow runs
+        uses: AoThen/delete-workflow-runs@main
+        with:
+              retain_days: 1
+              keep_minimum_runs: 5
