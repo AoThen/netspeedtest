@@ -17,12 +17,12 @@ jobs:
           - openwrt-21.02
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@main
         with:
           fetch-depth: 0
 
       - name: Building packages
-        uses: sbwml/openwrt-gh-action-sdk@go1.22
+        uses: sbwml/openwrt-gh-action-sdk@main
         env:
           ARCH: ${{ matrix.arch }}-${{ matrix.sdk }}
           FEEDNAME: packages_ci
@@ -30,7 +30,7 @@ jobs:
           NO_REFRESH_CHECK: true
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@main
         with:
           name: ${{ matrix.arch }}
           path: bin/packages/${{ matrix.arch }}/packages_ci/*.ipk
