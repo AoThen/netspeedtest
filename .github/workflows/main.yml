@@ -2,8 +2,6 @@ name: Build
 
 on:
   push:
-    tags:
-      - v2.**
 
 jobs:
   build:
@@ -14,22 +12,6 @@ jobs:
       matrix:
         arch:
           - aarch64_cortex-a53
-          - aarch64_cortex-a72
-          - aarch64_generic
-          - arm_arm1176jzf-s_vfp
-          - arm_arm926ej-s
-          - arm_cortex-a15_neon-vfpv4
-          - arm_cortex-a5_vfpv4
-          - arm_cortex-a7
-          - arm_cortex-a7_neon-vfpv4
-          - arm_cortex-a8_vfpv3
-          - arm_cortex-a9
-          - arm_cortex-a9_neon
-          - arm_cortex-a9_vfpv3-d16
-          - arm_mpcore
-          - i386_pentium4
-          - mips_mips32
-          - mipsel_mips32
           - x86_64
         sdk:
           - openwrt-21.02
@@ -53,11 +35,16 @@ jobs:
           name: ${{ matrix.arch }}
           path: bin/packages/${{ matrix.arch }}/packages_ci/*.ipk
  
-      - name: Upload packages
-        uses: ncipollo/release-action@v1
+      - name: Building packages 2
+        uses: openwrt/gh-action-sdk@main
+        env:
+          ARCH: ${{ matrix.arch }}-${{ matrix.branch }}
+          FEEDNAME: packages_ci
+          PACKAGES: luci-app-netspeedtest
+          NO_REFRESH_CHECK: true
+
+      - name: Upload artifacts 2
+        uses: actions/upload-artifact@main
         with:
-          name: ${{ github.ref_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          allowUpdates: true
-          replacesArtifacts: true
-          artifacts: "bin/packages/${{ matrix.arch }}/packages_ci/*.ipk"
+          name: luci-app-netspeedtest-${{ matrix.arch }}-${{ matrix.branch }}
+          path: bin/packages/${{ matrix.arch }}/packages_ci/*.ipk
